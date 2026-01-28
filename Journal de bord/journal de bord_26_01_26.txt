@@ -1,0 +1,22 @@
+1. Progression globale
+	- Bon début d'avancer sur les sprites. Codage primaire fait/base. Menu en progression. Avancer 
+moyenne des sons.
+	- Menu, physique des personnages, barres de vie, attaques, hit box.
+	- Création du code du menu, du code de base du jeu, des premiers personnages, des premiers sons.
+
+2. Progression par élève
+	- Wachter Ethan : code du jeu
+	  Gene Matthew : code du menu
+	  Courivaud Maxime : création des sprites
+	  Strhele Matheo : création des sons du jeu
+
+	- hit boxs
+	- Collisions : utilisation de la documention pyxel (git hub) et de l'IA
+	  Mise en lien de plusieur code : utilisation de la documention pyxel (git hub) et de l'IA
+	  sons limités : youtube
+	  couleurs limités : pinterest
+
+3. Prochaines améliorations 
+	- Taille du texte Menu/jeu
+
+	- Knockback
