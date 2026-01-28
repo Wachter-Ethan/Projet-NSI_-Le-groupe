@@ -7,20 +7,14 @@ WIDTH = 600
 HEIGHT = 400
 
 PAGE_MENU = 0
-PAGE_GAME = 1
-PAGE_OPTIONS = 2
+PAGE_CHARACTER_SELECT = 1   # AJOUT
+PAGE_GAME = 2
+PAGE_OPTIONS = 3
 
 page = PAGE_MENU
 
-# -----------------------------
-# Menu
-# -----------------------------
-current_option = 0
-options = ["Jouer", "Options", "Quitter"]
 
-
-
-# Parti code jeu :
+# Parametre du jeu
 
 # ======================
 # CONSTANTES D'ÉCHELLE
@@ -31,13 +25,14 @@ WINDOW_H = 400
 PERSO_W = 41
 PERSO_H = 80
 
-SOL_Y = WINDOW_H - PERSO_H
+SOL_Y = WINDOW_H - PERSO_H - 10
 
 VITESSE_X = 6
 VITESSE_Y = 5
 
 # KNOCKBACK
 KNOCKBACK = 50
+
 
 # ======================
 # JOUEUR 1
@@ -102,11 +97,28 @@ def est_sur(x1, y1, w1, h1, x2, y2, w2):
 
 
 
+
+# -----------------------------
+# Menu
+# -----------------------------
+current_option = 0
+options = ["Jouer", "Options", "Quitter"]
+
+# -----------------------------
+# Nouveau : Sélection des personnages
+# -----------------------------
+characters = ["Robot", "Plante"]
+char_index_p1 = 0
+char_index_p2 = 0
+selection_step = 0  # 0 = Joueur 1 choisit, 1 = Joueur 2 choisit
+
+
 # -----------------------------
 # Update
 # -----------------------------
 def update():
     global current_option, page
+    global char_index_p1, char_index_p2, selection_step
 
     # ---- Menu ----
     if page == PAGE_MENU:
@@ -117,11 +129,32 @@ def update():
 
         if pyxel.btnp(pyxel.KEY_P) or pyxel.btnp(pyxel.KEY_E):
             if options[current_option] == "Jouer":
-                page = PAGE_GAME
+                page = PAGE_CHARACTER_SELECT
+                selection_step = 0
             elif options[current_option] == "Options":
                 page = PAGE_OPTIONS
             elif options[current_option] == "Quitter":
                 pyxel.quit()
+
+    # ---- Sélection des personnages ----
+    elif page == PAGE_CHARACTER_SELECT:
+        # Joueur 1 choisit
+        if selection_step == 0:
+            if pyxel.btnp(pyxel.KEY_Q):
+                char_index_p1 = (char_index_p1 - 1) % len(characters)
+            if pyxel.btnp(pyxel.KEY_D):
+                char_index_p1 = (char_index_p1 + 1) % len(characters)
+            if pyxel.btnp(pyxel.KEY_E):
+                selection_step = 1  # Passe à J2
+
+        # Joueur 2 choisit
+        elif selection_step == 1:
+            if pyxel.btnp(pyxel.KEY_K):
+                char_index_p2 = (char_index_p2 - 1) % len(characters)
+            if pyxel.btnp(pyxel.KEY_M):
+                char_index_p2 = (char_index_p2 + 1) % len(characters)
+            if pyxel.btnp(pyxel.KEY_P):
+                page = PAGE_GAME  # Lance le jeu
 
     # ---- Jeu ----
     elif page == PAGE_GAME:
@@ -138,7 +171,7 @@ def update():
                 position_joueur1_x = nx
 
         if pyxel.btn(pyxel.KEY_Q):
-            position_joueur1_x = max(0, position_joueur1_x - VITESSE_X)
+            position_joueur1_x = max(10, position_joueur1_x - VITESSE_X)
 
         if pyxel.btnp(pyxel.KEY_Z) and not is_jumping:
             is_jumping = True
@@ -172,9 +205,9 @@ def update():
             if nx >= position_joueur1_x + PERSO_W:
                 position_joueur2_x = nx
 
-        if pyxel.btn(pyxel.KEY_M):
+        if pyxel.btn(pyxel.KEY_M) and position_joueur2_x <= 550:
             nx = position_joueur2_x + VITESSE_X
-            if nx + PERSO_W <= WINDOW_W:
+            if nx >= position_joueur2_x - PERSO_W:
                 position_joueur2_x = nx
 
         if pyxel.btnp(pyxel.KEY_O) and not is_jumping2:
@@ -215,7 +248,7 @@ def update():
                 position_joueur2_x += KNOCKBACK
                 if position_joueur2_x + PERSO_W > WINDOW_W:
                     position_joueur2_x = WINDOW_W - PERSO_W
-                
+                    
                 attaque1_a_touche = True
         else:
             attaque1_a_touche = False
@@ -235,7 +268,7 @@ def update():
                 attaque2_a_touche = True
         else:
             attaque2_a_touche = False
-        
+
     # ---- Options ----
     elif page == PAGE_OPTIONS:
         if pyxel.btnp(pyxel.KEY_TAB):
@@ -247,12 +280,29 @@ def update():
 def draw():
     pyxel.cls(11)
 
+    # ---- MENU ----
     if page == PAGE_MENU:
         pyxel.text(WIDTH//2 - 70, 50, "PLANT FIGHTER", pyxel.COLOR_BLACK)
         for i, option in enumerate(options):
             color = pyxel.COLOR_GREEN if i == current_option else pyxel.COLOR_BLACK
-            pyxel.text(WIDTH//2 - 40, 150 + i*50, option, color)  # texte plus grand et espacé
+            pyxel.text(WIDTH//2 - 40, 150 + i*50, option, color)
 
+    # ---- SELECTION DE PERSONNAGES ----
+    elif page == PAGE_CHARACTER_SELECT:
+        pyxel.cls(6)
+        pyxel.text(200, 40, "SELECTION DES PERSONNAGES", 0)
+
+        if selection_step == 0:
+            pyxel.text(260, 120, "Joueur 1 choisit :", 0)
+            pyxel.text(300, 200, characters[char_index_p1], 10)
+            pyxel.text(200, 350, "<- Q / D ->   Valider : E", 0)
+
+        else:
+            pyxel.text(260, 120, "Joueur 2 choisit :", 0)
+            pyxel.text(300, 200, characters[char_index_p2], 8)
+            pyxel.text(200, 350, "<- K / M ->   Valider : P", 0)
+
+    # ---- JEU ----
     elif page == PAGE_GAME:
         pyxel.cls(1)
 
@@ -287,7 +337,8 @@ def draw():
             pyxel.cls(0)
             pyxel.text(300, 200, 'GAME OVER', 7)
             pyxel.text(300, 250, 'J2 à ganger', 7)
-
+    
+    # ---- OPTIONS ----
     elif page == PAGE_OPTIONS:
         pyxel.cls(7)
         pyxel.text(50, 50, "=== OPTIONS ===", pyxel.COLOR_BLACK)
@@ -307,5 +358,7 @@ def draw():
 pyxel.init(WIDTH, HEIGHT, fps=60)
 # Lien avec les autres fichiers
 pyxel.load("Sprite-Robot.pyxres")
-
 pyxel.run(update, draw)
+
+
+

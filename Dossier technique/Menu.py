@@ -3,8 +3,8 @@ import pyxel
 # -----------------------------
 # Constantes et pages
 # -----------------------------
-WIDTH = 700
-HEIGHT = 500
+WIDTH = 600
+HEIGHT = 400
 
 PAGE_MENU = 0
 PAGE_CHARACTER_SELECT = 1   # AJOUT
@@ -130,6 +130,8 @@ def draw():
 # Lancement
 # -----------------------------
 pyxel.init(WIDTH, HEIGHT, fps=60)
+# Lien avec les autres fichiers
+pyxel.load("Sprite-Robot.pyxres")
 pyxel.run(update, draw)
 
 
