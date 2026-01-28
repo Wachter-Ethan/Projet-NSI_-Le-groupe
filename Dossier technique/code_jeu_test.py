@@ -6,10 +6,10 @@ import pyxel
 WINDOW_W = 600
 WINDOW_H = 400
 
-PERSO_W = 33
-PERSO_H = 76
+PERSO_W = 41
+PERSO_H = 80
 
-SOL_Y = WINDOW_H - PERSO_H
+SOL_Y = WINDOW_H - PERSO_H - 10
 
 VITESSE_X = 6
 VITESSE_Y = 5
@@ -205,7 +205,7 @@ def draw():
     if pv_joueur1 > 0 and pv_joueur2 > 0:
     # Joueurs
         pyxel.rect(position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H, 10)
-        pyxel.rect(position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H, 11)
+        pyxel.blt(position_joueur2_x, position_joueur2_y, 0, 6, 28, PERSO_W, PERSO_H, 0)
 
         # Attaques collées aux persos
         if attaque_active:
@@ -239,4 +239,7 @@ def draw():
 # LANCEMENT
 # ======================
 pyxel.init(WINDOW_W, WINDOW_H)
+# Lien avec les autres fichiers
+pyxel.load("Sprite-Robot.pyxres")
+
 pyxel.run(update, draw)
