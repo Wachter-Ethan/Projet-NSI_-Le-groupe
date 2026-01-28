@@ -14,6 +14,10 @@ SOL_Y = WINDOW_H - PERSO_H
 VITESSE_X = 6
 VITESSE_Y = 5
 
+# KNOCKBACK
+KNOCKBACK = 50
+
+
 # ======================
 # JOUEUR 1
 # ======================
@@ -84,6 +88,7 @@ def update():
     global position_joueur2_x, position_joueur2_y, is_jumping2
     global attaque_active, attaque_timer, attaque2_active, attaque2_timer
     global pv_joueur1, pv_joueur2, attaque1_a_touche, attaque2_a_touche
+    global KNOCKBACK, VITESSE_Y, VITESSE_X, SOL_Y, PERSO_H, PERSO_W
 
     # --- Joueur 1 déplacements ---
     if pyxel.btn(pyxel.KEY_D):
@@ -164,6 +169,12 @@ def update():
             attaque_portee, 50,
             position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
             pv_joueur2 -= 1
+            
+            # Knockback vers la droite
+            position_joueur2_x += KNOCKBACK
+            if position_joueur2_x + PERSO_W > WINDOW_W:
+                position_joueur2_x = WINDOW_W - PERSO_W
+                
             attaque1_a_touche = True
     else:
         attaque1_a_touche = False
@@ -174,6 +185,12 @@ def update():
             attaque2_portee, 50,
             position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H):
             pv_joueur1 -= 1
+            
+            # Knockback vers la gauche
+            position_joueur1_x -= KNOCKBACK
+            if position_joueur1_x < 0:
+                position_joueur1_x = 0
+            
             attaque2_a_touche = True
     else:
         attaque2_a_touche = False
