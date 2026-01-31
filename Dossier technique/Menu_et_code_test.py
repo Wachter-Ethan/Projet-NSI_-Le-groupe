@@ -74,7 +74,7 @@ VITESSE_X = 6
 VITESSE_Y = 5
 
 # KNOCKBACK
-KNOCKBACK = 50
+KNOCKBACK = 70
 
 
 # ======================
@@ -288,6 +288,10 @@ def update():
                 position_joueur2_x += KNOCKBACK
                 if position_joueur2_x + PERSO_W > WINDOW_W:
                     position_joueur2_x = WINDOW_W - PERSO_W
+                
+                position_joueur1_x -= KNOCKBACK
+                if position_joueur1_x < 0:
+                    position_joueur1_x = 0
                     
                 attaque1_a_touche = True
         else:
@@ -303,6 +307,10 @@ def update():
                 position_joueur1_x -= KNOCKBACK
                 if position_joueur1_x < 0:
                     position_joueur1_x = 0
+                
+                position_joueur2_x += KNOCKBACK
+                if position_joueur2_x + PERSO_W > WINDOW_W:
+                    position_joueur2_x = WINDOW_W - PERSO_W
                 
                 attaque2_a_touche = True
         else:
