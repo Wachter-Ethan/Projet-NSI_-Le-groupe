@@ -29,7 +29,7 @@ Répartition des tâches :
 	•M.S = Sound Design
 
 Temps passé sur le projet : 
-	•6 heures 0 minutes 0 secondes
+	•8 heures 0 minutes 0 secondes
 
 
 5.Ouverture :
