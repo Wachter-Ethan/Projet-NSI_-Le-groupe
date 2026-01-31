@@ -1,0 +1,2 @@
+Notre projet est un jeu imaginé et inspiré à partir de d'autres jeux tel que "street fighter", "Plante VS Zombie" et certain jeux Nintendo. Ce jeu met en place un affrontement entre 
+un robot, et une plante. L'objectif étant de battre sont adversaire. Le jeu se joue à 2 joueurs.
