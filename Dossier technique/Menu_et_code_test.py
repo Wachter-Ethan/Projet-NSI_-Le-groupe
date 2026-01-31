@@ -94,6 +94,9 @@ attaque_portee = 40
 pv_joueur1 = 15
 attaque1_a_touche = False
 
+hit_count_1 = 0          # nombre de coups portés
+can_ultimate_1 = False  # est-ce que l'ultimate est prête
+
 # ======================
 # JOUEUR 2
 # ======================
@@ -111,6 +114,9 @@ attaque2_portee = 40
 pv_joueur2 = 15
 attaque2_a_touche = False
 
+hit_count_2 = 0          # nombre de coups portés
+can_ultimate_2 = False  # est-ce que l'ultimate est prête
+
 # ======================
 # COLLISIONS
 # ======================
@@ -122,6 +128,30 @@ def collision_largeur(x1, y1, w1, h1, x2, y2, w2, h2):
         y1 + h1 > y2
     )
 
+# Ultimate joueur 1
+ultimate_1_x = 0
+ultimate_1_y = 0
+direction_ultimate_1 = 1  # 1 = droite, -1 = gauche
+ultimate_speed = 5             # rapide → difficile à esquiver
+ultimate_damage = 3
+ultimate_width = 50             # gros projectile
+ultimate_height = 50
+active_ultimate_1 = False
+
+# Ultimate joueur 2
+ultimate_2_x = 0
+ultimate_2_y = 0
+direction_ultimate_2 = -1  # 1 = droite, -1 = gauche
+active_ultimate_2 = False
+
+# Collision ulrimte
+def rect_collision(x1, y1, w1, h1, x2, y2, w2, h2):
+    return (
+        x1 < x2 + w2 and
+        x1 + w1 > x2 and
+        y1 < y2 + h2 and
+        y1 + h1 > y2
+    )
 
 
 # -----------------------------
@@ -180,6 +210,9 @@ def update():
         global attaque_active, attaque_timer, attaque2_active, attaque2_timer
         global attaque1_a_touche, attaque2_a_touche
         global KNOCKBACK, VITESSE_Y, VITESSE_X, SOL_Y, PERSO_H, PERSO_W
+        global ultimate_1_x, ultimate_1_y, ultimate_speed, ultimate_damage, ultimate_width, ultimate_height, active_ultimate_1
+        global ultimate_2_x, ultimate_2_y, active_ultimate_2
+        global hit_count_1, hit_count_2, can_ultimate_1, can_ultimate_2
 
         # --- Joueur 1 déplacements ---
         if pyxel.btn(pyxel.KEY_D):
@@ -249,6 +282,7 @@ def update():
         if attaque_active:
             if not attaque1_a_touche and collision_largeur(position_joueur1_x + PERSO_W, position_joueur1_y + 20, attaque_portee, 50, position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
                 pv_joueur2 -= 1
+                hit_count_1 += 1
                 
                 # Knockback vers la droite
                 position_joueur2_x += KNOCKBACK
@@ -260,11 +294,10 @@ def update():
             attaque1_a_touche = False
 
         if attaque2_active:
-            if not attaque2_a_touche and collision_largeur(
-                position_joueur2_x - attaque2_portee, position_joueur2_y + 20,
-                attaque2_portee, 50,
-                position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H):
+            if not attaque2_a_touche and collision_largeur(position_joueur2_x - attaque2_portee, position_joueur2_y + 20, attaque2_portee, 50, position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H):
                 pv_joueur1 -= 1
+                
+                hit_count_2 += 1
                 
                 # Knockback vers la gauche
                 position_joueur1_x -= KNOCKBACK
@@ -274,6 +307,42 @@ def update():
                 attaque2_a_touche = True
         else:
             attaque2_a_touche = False
+            
+        if hit_count_1 >= 5:
+            can_ultimate_1 = True
+        if hit_count_2 >= 5:
+            can_ultimate_2 = True
+        
+        # Utilisation ultimate
+        if pyxel.btnp(pyxel.KEY_A) and can_ultimate_1:
+            active_ultimate_1 = True
+            ultimate_1_x = position_joueur1_x
+            ultimate_1_y = position_joueur1_y
+            hit_count_1 = 0
+            can_ultimate_1 = False
+        if pyxel.btnp(pyxel.KEY_I) and can_ultimate_2:
+            active_ultimate_2 = True
+            ultimate_2_x = position_joueur2_x
+            ultimate_2_y = position_joueur2_y
+            hit_count_2 = 0
+            can_ultimate_2 = False
+        
+        if active_ultimate_1:
+            ultimate_1_x += ultimate_speed * direction_ultimate_1
+            if ultimate_1_x < - ultimate_width or ultimate_1_x > pyxel.width:
+                active_ultimate_1 = False
+            if rect_collision(ultimate_1_x, ultimate_1_y, ultimate_width, ultimate_height, position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
+                pv_joueur2 -= ultimate_damage
+                active_ultimate_1 = False
+        
+        if active_ultimate_2:
+            ultimate_2_x += ultimate_speed * direction_ultimate_2
+            if ultimate_2_x < - ultimate_width or ultimate_2_x > pyxel.width:
+                active_ultimate_2 = False
+            if rect_collision(ultimate_2_x, ultimate_2_y, ultimate_width, ultimate_height, position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H):
+                pv_joueur1 -= ultimate_damage
+                active_ultimate_2 = False
+            
         # ---- Options ----
     elif page == PAGE_OPTIONS:
         if pyxel.btnp(pyxel.KEY_TAB):
@@ -351,6 +420,18 @@ def draw():
             # PV
             pyxel.text(20, 10, f"J1 PV: {pv_joueur1}", 7)
             pyxel.text(WINDOW_W - 60, 10, f"J2 PV: {pv_joueur2}", 7)
+
+            if active_ultimate_1:
+                pyxel.circ(ultimate_1_x + ultimate_width // 2, ultimate_1_y + ultimate_height // 2, ultimate_width // 2, 9)
+
+            if can_ultimate_1:
+                pyxel.text(20, 50, "ULTIMATE 1 READY", 10)
+                
+            if active_ultimate_2:
+                pyxel.circ(ultimate_2_x + ultimate_width // 2, ultimate_2_y + ultimate_height // 2, ultimate_width // 2, 9)
+
+            if can_ultimate_2:
+                pyxel.text(WINDOW_W - 90, 50, "ULTIMATE 2 READY", 10)
 
         elif pv_joueur2 <= 0:
             pyxel.cls(0)
