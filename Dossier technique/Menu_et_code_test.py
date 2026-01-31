@@ -122,21 +122,6 @@ def collision_largeur(x1, y1, w1, h1, x2, y2, w2, h2):
         y1 + h1 > y2
     )
 
-def collision_hauteur(x1, y1, w1, h1, x2, y2, w2, h2):
-    return (
-        x1 + w1 > x2 and
-        x1 < x2 + w2 and
-        y1 + h1 <= y2 + 10 and
-        y1 + h1 >= y2
-    )
-
-def est_sur(x1, y1, w1, h1, x2, y2, w2):
-    return (
-        x1 + w1 > x2 and
-        x1 < x2 + w2 and
-        y1 + h1 == y2
-    )
-
 
 
 # -----------------------------
@@ -211,11 +196,7 @@ def update():
 
         if is_jumping:
             ny = position_joueur1_y + VITESSE_Y
-            if collision_hauteur(position_joueur1_x, ny, PERSO_W, PERSO_H,
-                                 position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
-                position_joueur1_y = position_joueur2_y - PERSO_H
-                is_jumping = False
-            elif ny < SOL_Y:
+            if ny < SOL_Y:
                 position_joueur1_y = ny
             else:
                 position_joueur1_y = SOL_Y
@@ -248,11 +229,7 @@ def update():
 
         if is_jumping2:
             ny = position_joueur2_y + VITESSE_Y
-            if collision_hauteur(position_joueur2_x, ny, PERSO_W, PERSO_H,
-                                 position_joueur1_x, position_joueur1_y, PERSO_W, PERSO_H):
-                position_joueur2_y = position_joueur1_y - PERSO_H
-                is_jumping2 = False
-            elif ny < SOL_Y:
+            if ny < SOL_Y:
                 position_joueur2_y = ny
             else:
                 position_joueur2_y = SOL_Y
@@ -270,10 +247,7 @@ def update():
 
         # --- Dégâts ---
         if attaque_active:
-            if not attaque1_a_touche and collision_largeur(
-                position_joueur1_x + PERSO_W, position_joueur1_y + 20,
-                attaque_portee, 50,
-                position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
+            if not attaque1_a_touche and collision_largeur(position_joueur1_x + PERSO_W, position_joueur1_y + 20, attaque_portee, 50, position_joueur2_x, position_joueur2_y, PERSO_W, PERSO_H):
                 pv_joueur2 -= 1
                 
                 # Knockback vers la droite
